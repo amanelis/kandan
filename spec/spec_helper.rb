@@ -12,6 +12,8 @@ Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  
+  # Devise controller Helpers, does not include 'sign_in' helper
   config.include Devise::TestHelpers, :type => :controllers
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -24,7 +26,7 @@ RSpec.configure do |config|
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
   
-  # Database cleaner
+  # Callback blocks
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
   end
@@ -43,5 +45,13 @@ RSpec.configure do |config|
 
   config.after(:each) do
     DatabaseCleaner.clean
+  end
+  
+  config.before(:all) do
+    DeferredGarbageCollection.start
+  end
+  
+  config.after(:all) do
+    DeferredGarbageCollection.reconsider
   end
 end
